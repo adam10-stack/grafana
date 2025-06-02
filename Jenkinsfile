@@ -4,7 +4,7 @@ pipeline {
     stages {
         stage('Clone Repository') {
             steps {
-                git branch: 'main', url: 'https://github.com/riyankhamdani/repo-devops.git'
+                git branch: 'main', url: 'https://github.com/adam10-stack/grafana.git'
             }
         }
 

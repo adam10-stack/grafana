@@ -2,32 +2,36 @@ pipeline {
     agent any
 
     stages {
-        stage('Clone Repository') {
-            steps {
-                git branch: 'main', url: 'https://github.com/adam10-stack/grafana.git'
-            }
-        }
-
-        stage('Build Docker Image') {
-            steps {
-                sh 'docker build -t grafana-custom:latest .'
-            }
-        }
-
-        stage('Run Grafana Container') {
+    
+        stage('Run install grafana') {
             steps {
                 sh '''
-                    docker stop grafana || true
-                    docker rm grafana || true
-                    docker run -d -p 3000:3000 --name grafana grafana-custom:latest
+                    sudo dnf install grafana -y
                 '''
             }
         }
 
-        stage('Katalon Test (Manual Trigger)') {
+        stage('start service grafana') {
             steps {
-                input "Run Katalon test?"
-                sh 'echo "Run Katalon test here"'
+                sh '''
+                    sudo systemctl enable --now grafana-server
+                    sudo systemctl status grafana-server
+                '''
+            }
+        }
+        
+        stage('set-up firewall') {
+            steps {
+                sh '''
+                    sudo firewall-cmd --add-port=3000/tcp --permanent
+                    sudo firewall-cmd --reload
+                '''
+            }
+        }
+        
+        stage('grafana Test Connection') {
+            steps {
+                sh 'curl -vk http://grafana:3000'
             }
         }
     }

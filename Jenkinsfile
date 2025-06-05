@@ -31,7 +31,7 @@ pipeline {
         
         stage('grafana Test Connection') {
             steps {
-                sh 'curl -vk http://grafana:3000'
+                sh 'wget http://grafana:3000'
             }
         }
     }

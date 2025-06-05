@@ -3,15 +3,24 @@ pipeline {
 
     stages {
     
-        stage('Run install grafana') {
+        stage('Install Grafana') {
             steps {
                 sh '''
                     sudo dnf install grafana -y
                 '''
             }
         }
-
-        stage('start service grafana') {
+       
+        stage('Set-up Firewall for Grafana') {
+            steps {
+                sh '''
+                    sudo firewall-cmd --add-port=3000/tcp --permanent
+                    sudo firewall-cmd --reload
+                '''
+            }
+        }
+		
+		stage('Start Grafana Service') {
             steps {
                 sh '''
                     sudo systemctl enable --now grafana-server
@@ -20,16 +29,7 @@ pipeline {
             }
         }
         
-        stage('set-up firewall') {
-            steps {
-                sh '''
-                    sudo firewall-cmd --add-port=3000/tcp --permanent
-                    sudo firewall-cmd --reload
-                '''
-            }
-        }
-        
-        stage('grafana Test Connection') {
+        stage('Test Grafana Connection') {
             steps {
                 sh 'wget http://grafana:3000'
             }
